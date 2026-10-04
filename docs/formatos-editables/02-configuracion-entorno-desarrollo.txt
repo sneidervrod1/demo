@@ -1,0 +1,82 @@
+Configuración de un entorno de desarrollo
+
+Este proyecto está construido con Spring Boot y Java, usando PostgreSQL como base de datos. A continuación se explica la configuración mínima necesaria para trabajar en el entorno.
+
+1. Dependencias del proyecto
+
+El archivo pom.xml define las librerías principales del sistema.
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+```
+
+2. Configuración de la base de datos
+
+En src/main/resources/application.properties se configura la conexión a PostgreSQL.
+
+```properties
+spring.application.name=demo
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/proyectoSpring
+spring.datasource.username=postgres
+spring.datasource.password=1208
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+3. Requisitos del entorno
+
+Para poder ejecutar el proyecto correctamente, se recomienda:
+
+- Java 18
+- Maven
+- PostgreSQL instalado y ejecutándose
+- IDE como IntelliJ IDEA o VS Code
+- Base de datos creada con el nombre proyectoSpring
+
+4. Ejecución del proyecto
+
+Se puede arrancar con Maven usando el siguiente comando:
+
+```bash
+./mvnw spring-boot:run
+```
+
+O ejecutar la prueba del proyecto:
+
+```bash
+./mvnw test
+```
+
+5. Buenas prácticas del entorno
+
+- Mantener la misma versión de Java en todo el equipo.
+- Usar variables de entorno para credenciales sensibles.
+- Revisar la consola de Spring Boot para detectar errores de conexión o JPA.
+- Activar la opción spring.jpa.show-sql=true para depurar consultas SQL.
+
+Con esta configuración, el entorno queda listo para desarrollar, probar y desplegar la aplicación REST.

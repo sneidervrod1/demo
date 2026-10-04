@@ -1,0 +1,88 @@
+# Implementación de la conectividad de bases de datos
+
+La persistencia de datos en este proyecto se realiza con Spring Data JPA y PostgreSQL.
+
+## 1. Repositorio
+
+La interfaz `ClienteRepository` extiende `JpaRepository`, lo que permite usar métodos CRUD automáticamente.
+
+```java
+package com.proyecto.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.proyecto.models.Cliente;
+
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+}
+```
+
+Con esto, el proyecto ya tiene acceso a operaciones como:
+
+- `save()`
+- `saveAll()`
+- `findAll()`
+- `findById()`
+- `delete()`
+
+## 2. Servicio de acceso a datos
+
+La lógica de negocio se encapsula en `ClienteService` y se comunica con el repositorio.
+
+```java
+@Service
+public class ClienteService {
+
+    private final ClienteRepository clienteRepository;
+
+    public ClienteService(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+    }
+
+    public List<Cliente> getClientes() {
+        return clienteRepository.findAll();
+    }
+
+    public Cliente getCliente(long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    }
+
+    public List<Cliente> addClientes(Cliente nuevoCliente) {
+        clienteRepository.save(nuevoCliente);
+        return clienteRepository.findAll();
+    }
+
+    public List<Cliente> addClientes(List<Cliente> nuevosClientes) {
+        return clienteRepository.saveAll(nuevosClientes);
+    }
+}
+```
+
+## 3. Configuración de PostgreSQL
+
+La conexión se define en el archivo de propiedades:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5433/proyectoSpring
+spring.datasource.username=postgres
+spring.datasource.password=1208
+spring.jpa.hibernate.ddl-auto=update
+```
+
+Esto permite que Hibernate cree o actualice la estructura de la base de datos según las entidades definidas.
+
+## 4. Flujo de trabajo
+
+1. La aplicación inicia y crea el `EntityManagerFactory`.
+2. Spring interpreta las entidades JPA.
+3. El `ClienteRepository` ejecuta operaciones sobre PostgreSQL.
+4. Las consultas y guardados se reflejan directamente en la base de datos.
+
+## 5. Ventajas
+
+- Reduce el código repetitivo para consultas básicas.
+- Hace más fácil mantener la lógica de persistencia.
+- Permite manejar datos complejos con un enfoque orientado a objetos.
+- Integra con Spring Boot de manera natural.
+
+La conectividad a base de datos es una parte central del proyecto, porque permite guardar, recuperar y actualizar información del cliente de forma segura y eficiente.

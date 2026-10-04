@@ -1,0 +1,116 @@
+Implementación de estructuras de datos
+
+En este proyecto se utilizan estructuras de datos comunes en Java para representar entidades, listas y conjuntos de clientes.
+
+1. Modelo de datos
+
+La entidad Cliente hereda de Persona y se mappea a la tabla cliente con JPA.
+
+```java
+package com.proyecto.models;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "cliente")
+public class Cliente extends Persona {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
+    private String correo;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private NivelCliente nivel;
+}
+```
+
+La clase Persona define atributos comunes reutilizables para todas las entidades del sistema.
+
+```java
+package com.proyecto.models;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@MappedSuperclass
+public class Persona {
+
+    @Column
+    private String nombre;
+
+    @Column
+    private String apellido;
+
+    @Column
+    private int edad;
+}
+```
+
+2. Enumeraciones para valores controlados
+
+Se usa el tipo enum para definir niveles, evitando errores de texto libre y permitiendo reglas de negocio.
+
+```java
+package com.proyecto.models;
+
+public enum NivelCliente {
+
+    PLATA(1),
+    ORO(2),
+    DIAMANTE(3);
+
+    private final int valor;
+
+    NivelCliente(int valor) {
+        this.valor = valor;
+    }
+
+    public int getValor() {
+        return valor;
+    }
+}
+```
+
+3. Uso de listas y conjuntos
+
+En el servicio se usa List<Cliente> para recuperar todos los clientes y Set<Cliente> para guardar clientes con un nivel superior.
+
+```java
+public Set<Cliente> clientesConNivelSuperior(Long id) {
+
+    Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+    NivelCliente nivelActual = cliente.getNivel();
+    List<Cliente> clientes = clienteRepository.findAll();
+    Set<Cliente> resultado = new HashSet<>();
+
+    for (Cliente c : clientes) {
+        if (c.getNivel().getValor() > nivelActual.getValor()) {
+            resultado.add(c);
+        }
+    }
+
+    return resultado;
+}
+```
+
+4. ¿Por qué son importantes estas estructuras?
+
+- List: ideal para almacenar colecciones ordenadas de clientes.
+- Set: útil cuando no se permiten elementos duplicados en la comparación.
+- Enum: garantiza valores consistentes del dominio (PLATA, ORO, DIAMANTE).
+- Entity: representa la estructura persistente de la base de datos.
+
+Este enfoque permite manejar con claridad la información del negocio y mantener el código más seguro y mantenible.
